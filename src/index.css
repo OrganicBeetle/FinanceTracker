@@ -1,0 +1,36 @@
+@tailwind utilities;
+
+@font-face {
+  font-family: woff1;
+  src: url(./assets/file1.woff2);
+}
+@font-face {
+  font-family: woff2;
+  src: url(./assets/file2.woff2);
+}
+@font-face {
+  font-family: woff3;
+  src: url(./assets/file3.woff2);
+}
+@font-face {
+  font-family: woff4;
+  src: url(./assets/file4.woff2);
+}
+@font-face {
+  font-family: woff5;
+  src: url(./assets/file5.woff2);
+}
+@font-face {
+  font-family: woff6;
+  src: url(./assets/file6.woff2);
+}
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body, html {
+  width: 100%;
+  overflow-x: hidden; /* Prevent horizontal scroll */
+}
