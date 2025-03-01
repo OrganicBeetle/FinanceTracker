@@ -1,19 +1,17 @@
 import React, { useState, useEffect } from "react";
-import "./Signup.css"; // Import your existing CSS
+import "./Signup.css";
 import "../components/ForgotPassword.css";
 import Header from "../components/header";
 import {
   createUserWithEmailAndPassword,
-  sendPasswordResetEmail,
   signInWithEmailAndPassword,
+  sendPasswordResetEmail,
 } from "firebase/auth";
 import { toast } from "react-toastify";
 import { auth, db, provider } from "../firebase";
-import { doc, setDoc } from "firebase/firestore";
-import { getDoc } from "firebase/firestore";
+import { doc, setDoc, getDoc } from "firebase/firestore";
 import { Link, useNavigate } from "react-router-dom";
-import { GoogleAuthProvider, signInWithPopup } from "firebase/auth";
-import { FacebookAuthProvider } from "firebase/auth";
+import { GoogleAuthProvider } from "firebase/auth";
 import ForgotPassword from "../components/ForgotPassword";
 
 const Signup = () => {
@@ -21,9 +19,10 @@ const Signup = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
-  const [loginForm, setLoginForm] = useState(false); // Track user sign-in status
+  const [loginForm, setLoginForm] = useState(false);
   const [isFormVisible, setIsFormVisible] = useState(false);
   const navigate = useNavigate();
+  const [resetEmail, setResetEmail] = useState("");
 
   const handleForgotPasswordClick = () => {
     setIsFormVisible(true);
@@ -31,6 +30,7 @@ const Signup = () => {
 
   const handleCloseForm = () => {
     setIsFormVisible(false);
+    setResetEmail(""); // Clear the email when closing the form
   };
 
   const getFriendlyErrorMessage = (errorCode) => {
@@ -53,106 +53,105 @@ const Signup = () => {
     return errorMessages[errorCode] || errorMessages["default"];
   };
 
-  const signupWithEmail = (e) => {
-    setLoading(true);
-    e.preventDefault(); // Prevent the default form submission
-
-    // Authenticate a New User Account
-    if (name !== "" && email !== "" && password !== "") {
-      createUserWithEmailAndPassword(auth, email, password)
-        .then((userCredential) => {
-          // Signed up
-          const user = userCredential.user;
-          console.log("USER -> ", user);
-          toast.success("Account Created Successfully");
-          localStorage.setItem(
-            "user",
-            JSON.stringify({
-              uid: user.uid,
-              email: user.email,
-              name: user.displayName || name,
-            })
-          );
-          setLoading(false);
-          setName("");
-          setEmail("");
-          setPassword("");
-          createUserDocument(user, name); // Pass name as a second argument
-          navigate("/dashboard");
-        })
-        .catch((error) => {
-          const errorCode = error.code;
-          const errorMessage = error.message;
-          toast.error(getFriendlyErrorMessage(errorCode));
-          setLoading(false);
-        });
-    } else {
-      toast.error("All Fields are Mandatory");
-      setLoading(false);
-    }
-  };
-
-  const loginWithEmail = (e) => {
-    setLoading(true);
-    e.preventDefault(); // Prevent the default form submission
-    if (email !== "" && password !== "") {
-      signInWithEmailAndPassword(auth, email, password)
-        .then((userCredential) => {
-          // Signed in
-          const user = userCredential.user;
-          toast.success("Successfully Logged In!");
-          localStorage.setItem(
-            "user",
-            JSON.stringify({
-              uid: user.uid,
-              email: user.email,
-              name: user.displayName || name,
-            })
-          );
-          setLoading(false);
-          navigate("/dashboard");
-        })
-        .catch((error) => {
-          const errorCode = error.code;
-          const errorMessage = error.message;
-          toast.error(getFriendlyErrorMessage(errorCode));
-          setLoading(false);
-        });
-    } else {
-      toast.error("All Fields are Mandatory!");
-      setLoading(false);
-    }
-  };
-
-  const signupWithGoogle = (e) => {
-    setLoading(true);
+  const signupWithEmail = async (e) => {
     e.preventDefault();
+    setLoading(true);
 
-    signInWithPopup(auth, provider)
-      .then((result) => {
-        const user = result.user;
-        const credential = GoogleAuthProvider.credentialFromResult(result);
-        const token = credential.accessToken;
-        toast.success("Successfully Authenticated!");
-        localStorage.setItem(
-          "user",
-          JSON.stringify({
-            uid: user.uid,
-            email: user.email,
-            name: user.displayName || name,
-          })
-        );
-        createUserDocument(user, user.displayName); // Store user details in Firestore
-        setLoading(false);
-        console.log("Navigating to Dashboard...");
-        navigate("/dashboard");
-      })
-      .catch((error) => {
-        const errorCode = error.code;
-        const errorMessage = error.message;
-        toast.error(getFriendlyErrorMessage(errorCode));
-        setLoading(false);
-      });
+    if (!name || !email || !password) {
+      toast.error("All fields are mandatory");
+      setLoading(false);
+      return;
+    }
+
+    try {
+      const userCredential = await createUserWithEmailAndPassword(
+        auth,
+        email,
+        password
+      );
+      const user = userCredential.user;
+      console.log("USER -> ", user);
+      await createUserDocument(user, name);
+      toast.success("Account Created Successfully");
+      localStorage.setItem(
+        "user",
+        JSON.stringify({
+          uid: user.uid,
+          email: user.email,
+          name: user.displayName || name,
+        })
+      );
+      setName("");
+      setEmail("");
+      setPassword("");
+      navigate("/dashboard");
+    } catch (error) {
+      const errorCode = error.code;
+      toast.error(getFriendlyErrorMessage(errorCode));
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const loginWithEmail = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+
+    if (!email || !password) {
+      toast.error("All fields are mandatory!");
+      setLoading(false);
+      return;
+    }
+
+    try {
+      const userCredential = await signInWithEmailAndPassword(
+        auth,
+        email,
+        password
+      );
+      const user = userCredential.user;
+      toast.success("Successfully Logged In!");
+      localStorage.setItem(
+        "user",
+        JSON.stringify({
+          uid: user.uid,
+          email: user.email,
+          name: user.displayName || name,
+        })
+      );
+      navigate("/dashboard");
+    } catch (error) {
+      const errorCode = error.code;
+      toast.error(getFriendlyErrorMessage(errorCode));
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const signupWithGoogle = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+
+    try {
+      const result = await signInWithPopup(auth, provider);
+      const user = result.user;
+      await createUserDocument(user, user.displayName);
+      toast.success("Successfully Authenticated!");
+      localStorage.setItem(
+        "user",
+        JSON.stringify({
+          uid: user.uid,
+          email: user.email,
+          name: user.displayName || user.displayName,
+        })
+      );
+      navigate("/dashboard");
+    } catch (error) {
+      const errorCode = error.code;
+      toast.error(getFriendlyErrorMessage(errorCode));
+    } finally {
+      setLoading(false);
+    }
   };
 
   const createUserDocument = async (user, name) => {
@@ -160,26 +159,41 @@ const Signup = () => {
 
     try {
       const userRef = doc(db, "users", user.uid);
-      const userData = await getDoc(userRef); // Fetch the user document
+      const userData = await getDoc(userRef);
 
       if (!userData.exists()) {
-        // If the document does not exist, create it
         await setDoc(userRef, {
-          name: user.displayName ? user.displayName : name, // Set display name or fallback to provided name
+          name: user.displayName || name,
           email: user.email,
-          photoUrl: user.photoURL ? user.photoURL : "", // Ensure you use photoURL instead of photoUrl
+          photoUrl: user.photoURL || "",
           createdAt: new Date(),
         });
-        // toast.success("User Document Created Successfully");
-        setLoading(false);
-      } else {
-        // If the document already exists, show an error
-        // toast.error("Document already exists");
-        setLoading(false);
       }
-    } catch (e) {
-      // Catch any errors in either getting or setting the document
-      toast.error(`Error: ${e.message}`);
+    } catch (error) {
+      toast.error(`Error creating user document: ${error.message}`);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleResetPassword = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+
+    if (!resetEmail) {
+      toast.error("Please enter your email address.");
+      setLoading(false);
+      return;
+    }
+
+    try {
+      await sendPasswordResetEmail(auth, resetEmail);
+      toast.success("Password reset email sent!");
+      handleCloseForm(); // Close the form after sending the email
+    } catch (error) {
+      const errorCode = error.code;
+      toast.error(getFriendlyErrorMessage(errorCode));
+    } finally {
       setLoading(false);
     }
   };
@@ -187,15 +201,10 @@ const Signup = () => {
   return (
     <>
       <Header />
-      <div className="min-h-screen flex justify-center items-center p-6 ">
-        {/* Conditional rendering based on user sign-in state */}
+      <div className="min-h-screen flex justify-center items-center p-6">
         {!loginForm ? (
-          /* Sign Up Form */
-          <form
-            className="form"
-            onSubmit={signupWithEmail} // Use onSubmit to trigger the function
-          >
-            <div className="title text-[10rem] font-bold mb-6 mt-[1rem] ml-[10px]">
+          <form className="form" onSubmit={signupWithEmail}>
+            <div className="title text-[5rem] font-bold mb-6 mt-[1rem] ml-[10px]">
               Welcome,
               <br />
               <span className="text-gray-600 font-medium text-lg">
@@ -203,37 +212,36 @@ const Signup = () => {
               </span>
             </div>
             <input
-              className="input p-5 mb-4 w-full border-2 border-black rounded-lg shadow-sm"
+              className="input p-3 mb-4 w-full border-2 border-black rounded-lg shadow-sm"
               name="Full Name"
               placeholder="Full Name"
               type="text"
-              value={name} // Bind the input value to state
-              onChange={(e) => setName(e.target.value)} // Update state on input change
+              value={name}
+              onChange={(e) => setName(e.target.value)}
             />
             <input
               className="input p-3 mb-4 w-full border-2 border-black rounded-lg shadow-sm"
               name="email"
               placeholder="Email"
               type="email"
-              value={email} // Bind the input value to state
-              onChange={(e) => setEmail(e.target.value)} // Update state on input change
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
             />
             <input
               className="input p-3 mb-4 w-full border-2 border-black rounded-lg shadow-sm"
               name="password"
               placeholder="Password"
               type="password"
-              value={password} // Bind the input value to state
-              onChange={(e) => setPassword(e.target.value)} // Update state on input change
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
             />
-            <div className="mt-[0.5 rem] login-with flex gap-4 self-center">
+            <div className="mt-[0.5rem] login-with flex gap-4 self-center">
               <div
                 className="button-log p-3 w-12 h-12 flex justify-center items-center rounded-full border-2 border-black bg-lightblue shadow-lg cursor-pointer"
                 onClick={signupWithGoogle}
               >
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
-                  xmlnsXlink="http://www.w3.org/1999/xlink"
                   viewBox="0 0 56.6934 56.6934"
                   className="icon w-6 h-6 fill-black"
                 >
@@ -248,11 +256,11 @@ const Signup = () => {
     bg-lightblue shadow-lg font-semibold text-black cursor-pointer 
     disabled:cursor-not-allowed disabled:opacity-50`}
             >
-              {loading ? "Loading..." : "Let's go →"}
+              {loading ? "Let's go →" : "Let's go →"}
             </button>
             <div className="redirect">
               <span>
-                Already have an account?{"  "}
+                Already have an account?{" "}
                 <span
                   onClick={() => {
                     setLoginForm(!loginForm);
@@ -264,12 +272,8 @@ const Signup = () => {
             </div>
           </form>
         ) : (
-          /*Login Form*/
-          <form
-            className="form"
-            onSubmit={loginWithEmail} // Use onSubmit to trigger the function
-          >
-            <div className="title text-[10rem] font-bold mb-6 mt-[1rem] ml-[10px]">
+          <form className="form" onSubmit={loginWithEmail}>
+            <div className="title text-[5rem] font-bold mb-6 mt-[1rem] ml-[10px]">
               Welcome Back,
               <br />
               <span className="text-gray-600 font-medium text-lg">
@@ -281,26 +285,24 @@ const Signup = () => {
               name="email"
               placeholder="Email"
               type="email"
-              value={email} // Bind the input value to state
-              onChange={(e) => setEmail(e.target.value)} // Update state on input change
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
             />
             <input
               className="input p-3 mb-4 w-full border-2 border-black rounded-lg shadow-sm"
               name="password"
               placeholder="Password"
               type="password"
-              value={password} // Bind the input value to state
-              onChange={(e) => setPassword(e.target.value)} // Update state on input change
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
             />
-            <div className="mt-[0.5 rem] login-with flex gap-4 self-center">
-              {/* Google Icon */}
+            <div className="mt-[0.5rem] login-with flex gap-4 self-center">
               <div
                 className="button-log p-3 w-12 h-12 flex justify-center items-center rounded-full border-2 border-black bg-lightblue shadow-lg cursor-pointer"
                 onClick={signupWithGoogle}
               >
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
-                  xmlnsXlink="http://www.w3.org/1999/xlink"
                   viewBox="0 0 56.6934 56.6934"
                   className="icon w-6 h-6 fill-black"
                 >
@@ -309,7 +311,7 @@ const Signup = () => {
               </div>
             </div>
             <button
-              disabled={loading} // ✅ Correct syntax
+              disabled={loading}
               type="submit"
               className={`button-confirm w-full h-10 rounded-lg border-2 border-black 
     bg-lightblue shadow-lg font-semibold text-black cursor-pointer 
@@ -330,54 +332,7 @@ const Signup = () => {
                 </span>
               </span>
             </div>
-
-            {/* Forgot Password Button */}
-            <div className="mt-4 text-center flex justify-center items-center">
-              <p
-                className="forgotPassword text-[woff1] cursor-pointer"
-                onClick={handleForgotPasswordClick}
-              >
-                Forgot your password?
-              </p>
-            </div>
-
-            {/* Forgot Password Form */}
-            {isFormVisible && (
-              <div className="modal-overlay fixed top-0 left-0 w-full h-full flex items-center justify-center bg-black bg-opacity-50">
-                <div className="forgot-password-form bg-white p-6 rounded-lg shadow-lg relative">
-                  <div className="close">
-                    <h2 className="text-lg font-bold mb-4">Reset Password</h2>
-                    <button
-                      onClick={handleCloseForm}
-                      className="absolute top-2 right-2 text-gray-600 hover:text-gray-900 text-2xl"
-                    >
-                      ✖
-                    </button>
-                  </div>
-
-                  {/* Reset Password Form */}
-                  <form onSubmit={handlePasswordReset} className="w-full">
-                    <input
-                      type="email"
-                      placeholder="Enter your email"
-                      className="w-full p-2 border-2 border-black rounded-md mb-4"
-                      required
-                    />
-                    <div className="submit flex justify-center items-center">
-                      <button
-                        type="submit"
-                        disabled={loading}
-                        className={`w-full h-10 rounded-lg border-2 border-black 
-            bg-lightblue shadow-lg font-semibold text-black cursor-pointer 
-            disabled:cursor-not-allowed disabled:opacity-50 mt-4`}
-                      >
-                        {loading ? "Loading..." : "Send Reset Link"}
-                      </button>
-                    </div>
-                  </form>
-                </div>
-              </div>
-            )}
+            <ForgotPassword />
           </form>
         )}
       </div>
