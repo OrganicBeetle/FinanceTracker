@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import "./Signup.css"; // Import your existing CSS
-import '../components/ForgotPassword.css'
+import "../components/ForgotPassword.css";
 import Header from "../components/header";
 import {
   createUserWithEmailAndPassword,
@@ -246,7 +246,7 @@ const Signup = () => {
               type="submit"
               className={`button-confirm w-full h-10 rounded-lg border-2 border-black 
     bg-lightblue shadow-lg font-semibold text-black cursor-pointer 
-    disabled:cursor-not-allowed disabled:opacity-50 mt-4`}
+    disabled:cursor-not-allowed disabled:opacity-50`}
             >
               {loading ? "Loading..." : "Let's go →"}
             </button>
@@ -318,7 +318,7 @@ const Signup = () => {
               {loading ? "Loading..." : "Let's go →"}
             </button>
             <div className="redirect">
-              <span className="font-semibold text-[1rem] text-[woff2] mt-[2px]">
+              <span className="font-semibold text-[1rem] text-[woff2] mt-[2px] flex justify-center">
                 Don't have an account?{" "}
                 <span
                   className=" font-bold text-[woff2] cursor-pointer"
@@ -332,16 +332,49 @@ const Signup = () => {
             </div>
 
             {/* Forgot Password Button */}
-            <div className="mt-4 text-center">
-              <p className="forgotPassword text-[woff1]" onClick={handleForgotPasswordClick}>Forgot your password?</p>
+            <div className="mt-4 text-center flex justify-center items-center">
+              <p
+                className="forgotPassword text-[woff1] cursor-pointer"
+                onClick={handleForgotPasswordClick}
+              >
+                Forgot your password?
+              </p>
             </div>
+
             {/* Forgot Password Form */}
             {isFormVisible && (
-              <div className="modal-overlay">
-                <div className="forgot-password-form">
-                  <h2>Reset Password</h2>
-                  <input type="email" placeholder="Enter your email" />
-                  <button onClick={setIsFormVisible(false)}>close</button>
+              <div className="modal-overlay fixed top-0 left-0 w-full h-full flex items-center justify-center bg-black bg-opacity-50">
+                <div className="forgot-password-form bg-white p-6 rounded-lg shadow-lg relative">
+                  <div className="close">
+                    <h2 className="text-lg font-bold mb-4">Reset Password</h2>
+                    <button
+                      onClick={handleCloseForm}
+                      className="absolute top-2 right-2 text-gray-600 hover:text-gray-900 text-2xl"
+                    >
+                      ✖
+                    </button>
+                  </div>
+
+                  {/* Reset Password Form */}
+                  <form onSubmit={handlePasswordReset} className="w-full">
+                    <input
+                      type="email"
+                      placeholder="Enter your email"
+                      className="w-full p-2 border-2 border-black rounded-md mb-4"
+                      required
+                    />
+                    <div className="submit flex justify-center items-center">
+                      <button
+                        type="submit"
+                        disabled={loading}
+                        className={`w-full h-10 rounded-lg border-2 border-black 
+            bg-lightblue shadow-lg font-semibold text-black cursor-pointer 
+            disabled:cursor-not-allowed disabled:opacity-50 mt-4`}
+                      >
+                        {loading ? "Loading..." : "Send Reset Link"}
+                      </button>
+                    </div>
+                  </form>
                 </div>
               </div>
             )}

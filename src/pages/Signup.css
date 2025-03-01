@@ -17,9 +17,23 @@
     box-shadow: 4px 4px var(--main-color);
   }
 
+  .close {
+    display: inline-flex;
+    justify-content: end;
+    align-items: end;
+  }
+
+  .close button{
+    position: relative;
+    top: -8px;
+    right: 2px;
+    border: none;
+    background-color: lightblue;
+    padding-left: 6rem;
+  }
   .redirect {
     font-size: 16px;
-    /* font-weight: 100; */
+    margin-top: 20px;
   }
 
   .redirect span{
@@ -31,6 +45,7 @@
   }
 
   .redirect span span{
+    
     font-size: 16px;
     color: #2d8cf0;
     cursor: pointer;
@@ -106,7 +121,7 @@
   }
   
   .button-confirm {
-    margin: 30px auto 0 auto;
+    margin: 5px auto 0 auto;
     width: 120px;
     height: 40px;
     border-radius: 5px;
@@ -118,4 +133,31 @@
     color: var(--font-color);
     cursor: pointer;
   }
+
+  .submit {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+
+  .submit button {
+    margin: 5px auto 0 auto;
+    width: 120px;
+    height: 40px;
+    border-radius: 5px;
+    border: 2px solid var(--main-color);
+    background-color: var(--bg-color);
+    box-shadow: 4px 4px var(--main-color);
+    font-size: 20px;
+    font-weight: 600;
+    color: var(--font-color);
+    cursor: pointer;
+  }
+
+  .submit button:active {
+    box-shadow: 0px 0px var(--main-color);
+    transform: translate(3px, 3px);
+  }
+
+
   
