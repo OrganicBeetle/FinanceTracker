@@ -16,9 +16,37 @@
     border: 2px solid var(--main-color);
     box-shadow: 4px 4px var(--main-color);
   }
-  
+
+  .redirect {
+    font-size: 16px;
+    /* font-weight: 100; */
+  }
+
+  .redirect span{
+    font-size: 16px;
+    font-weight: 100;
+    /* font-weight:; */
+    cursor: pointer;
+    font-family: woff3;
+  }
+
+  .redirect span span{
+    font-size: 16px;
+    color: #2d8cf0;
+    cursor: pointer;
+    font-family: woff2;
+  }
+
+  .forgotPassword {
+    border: none;
+    background-color: lightblue ;
+    font-size: 14px;
+    color: #2d8cf0;
+    cursor: pointer;
+    font-family: woff2;
+  }
+
   .title {
-    font-style: message-box;
     color: var(--font-color);
     font-weight: 900;
     font-size: 20px;

@@ -1,0 +1,27 @@
+.navbar{
+    background-color: #5a90abde;
+    padding: 10px;
+    position: sticky;
+    top: 0;
+    left: 0;
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.logout{
+    border: none;
+    background-color: #5a90abde;
+    padding: 20px;
+    font-size: 16px;
+    cursor: pointer;
+    border-radius: 1px;
+    transition: background-color 0.3s ease, transform 0.3s ease;
+    
+}
+.logout:hover{
+    background-color: #0056b3; /* Darker background on hover */
+    transform: scale(1.1);
+}
+
