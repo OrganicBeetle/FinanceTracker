@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import "./Signup.css"; // Import your existing CSS
+import '../components/ForgotPassword.css'
 import Header from "../components/header";
 import {
   createUserWithEmailAndPassword,
@@ -21,7 +22,36 @@ const Signup = () => {
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [loginForm, setLoginForm] = useState(false); // Track user sign-in status
+  const [isFormVisible, setIsFormVisible] = useState(false);
   const navigate = useNavigate();
+
+  const handleForgotPasswordClick = () => {
+    setIsFormVisible(true);
+  };
+
+  const handleCloseForm = () => {
+    setIsFormVisible(false);
+  };
+
+  const getFriendlyErrorMessage = (errorCode) => {
+    const errorMessages = {
+      "auth/email-already-in-use":
+        "This email is already in use. Try logging in.",
+      "auth/invalid-email": "Please enter a valid email address.",
+      "auth/weak-password": "Password must be at least 6 characters long.",
+      "auth/user-not-found": "No account found. Please sign up first.",
+      "auth/wrong-password":
+        "Incorrect password. Try again or reset your password.",
+      "auth/network-request-failed":
+        "Network error. Check your internet connection.",
+      "auth/popup-closed-by-user": "Sign-in Pop-up was closed. Try again.",
+      "auth/cancelled-popup-request":
+        "Multiple popups were blocked. Please try again.",
+      default: "Something went wrong. Please try again.",
+    };
+
+    return errorMessages[errorCode] || errorMessages["default"];
+  };
 
   const signupWithEmail = (e) => {
     setLoading(true);
@@ -35,6 +65,14 @@ const Signup = () => {
           const user = userCredential.user;
           console.log("USER -> ", user);
           toast.success("Account Created Successfully");
+          localStorage.setItem(
+            "user",
+            JSON.stringify({
+              uid: user.uid,
+              email: user.email,
+              name: user.displayName || name,
+            })
+          );
           setLoading(false);
           setName("");
           setEmail("");
@@ -45,14 +83,14 @@ const Signup = () => {
         .catch((error) => {
           const errorCode = error.code;
           const errorMessage = error.message;
-          toast.error(errorMessage);
+          toast.error(getFriendlyErrorMessage(errorCode));
           setLoading(false);
         });
     } else {
       toast.error("All Fields are Mandatory");
       setLoading(false);
     }
-  }
+  };
 
   const loginWithEmail = (e) => {
     setLoading(true);
@@ -63,20 +101,28 @@ const Signup = () => {
           // Signed in
           const user = userCredential.user;
           toast.success("Successfully Logged In!");
+          localStorage.setItem(
+            "user",
+            JSON.stringify({
+              uid: user.uid,
+              email: user.email,
+              name: user.displayName || name,
+            })
+          );
           setLoading(false);
           navigate("/dashboard");
         })
         .catch((error) => {
           const errorCode = error.code;
           const errorMessage = error.message;
-          toast.error(errorMessage);
+          toast.error(getFriendlyErrorMessage(errorCode));
           setLoading(false);
         });
     } else {
       toast.error("All Fields are Mandatory!");
       setLoading(false);
     }
-  }
+  };
 
   const signupWithGoogle = (e) => {
     setLoading(true);
@@ -88,54 +134,27 @@ const Signup = () => {
         const credential = GoogleAuthProvider.credentialFromResult(result);
         const token = credential.accessToken;
         toast.success("Successfully Authenticated!");
+        localStorage.setItem(
+          "user",
+          JSON.stringify({
+            uid: user.uid,
+            email: user.email,
+            name: user.displayName || name,
+          })
+        );
         createUserDocument(user, user.displayName); // Store user details in Firestore
         setLoading(false);
+        console.log("Navigating to Dashboard...");
         navigate("/dashboard");
       })
       .catch((error) => {
         const errorCode = error.code;
         const errorMessage = error.message;
-        toast.error(errorMessage);
+        toast.error(getFriendlyErrorMessage(errorCode));
         setLoading(false);
       });
   };
 
-  const signupWithFacebook = (e) => {
-    setLoading(true);
-    e.preventDefault();
-
-    const provider = new FacebookAuthProvider();
-
-    try {
-      signInWithPopup(auth, provider)
-        .then((result) => {
-          // This gives you a Facebook Access Token. You can use it to access the Facebook API.
-          const credential = FacebookAuthProvider.credentialFromResult(result);
-          const token = credential.accessToken;
-
-          // The signed-in user info.
-          const user = result.user;
-          toast.success("Successfully Authenticated!");
-
-          // You can also access additional info if needed:
-          // const userInfo = getAdditionalUserInfo(result);
-
-          // Optionally, call a function to handle the user's information:
-          createUserDocument(user, user.displayName || name); // Assuming 'createUserDocument' handles user info
-          setLoading(false);
-        })
-        .catch((error) => {
-          const errorCode = error.code;
-          const errorMessage = error.message;
-          toast.error(errorMessage);
-          setLoading(false);
-        });
-    } catch (e) {
-      toast.error(e.message);
-      setLoading(false);
-    }
-  }
-  
   const createUserDocument = async (user, name) => {
     setLoading(true);
 
@@ -168,10 +187,10 @@ const Signup = () => {
   return (
     <>
       <Header />
-
-      <div className="min-h-screen flex justify-center items-center p-6">
+      <div className="min-h-screen flex justify-center items-center p-6 ">
         {/* Conditional rendering based on user sign-in state */}
         {!loginForm ? (
+          /* Sign Up Form */
           <form
             className="form"
             onSubmit={signupWithEmail} // Use onSubmit to trigger the function
@@ -208,26 +227,6 @@ const Signup = () => {
               onChange={(e) => setPassword(e.target.value)} // Update state on input change
             />
             <div className="mt-[0.5 rem] login-with flex gap-4 self-center">
-              {/* Facebook icon */}
-              <div
-                className="button-log p-3 w-12 h-12 flex justify-center items-center rounded-full border-2 border-black bg-lightblue shadow-lg cursor-pointer"
-                onClick={signupWithFacebook}
-              >
-                <svg
-                  width="100"
-                  height="100"
-                  viewBox="0 0 100 100"
-                  fill="none"
-                  xmlns="http://www.w3.org/2000/svg"
-                >
-                  <circle cx="50" cy="50" r="45" fill="#F5F5DC" />
-                  <path
-                    d="M63 30H57C53.134 30 50 33.134 50 37V43H63V53H50V70H40V53H34V43H40V37C40 29.82 45.82 24 53 24H63V30Z"
-                    fill="black"
-                  />
-                </svg>
-              </div>
-              {/* Google Icon */}
               <div
                 className="button-log p-3 w-12 h-12 flex justify-center items-center rounded-full border-2 border-black bg-lightblue shadow-lg cursor-pointer"
                 onClick={signupWithGoogle}
@@ -243,7 +242,7 @@ const Signup = () => {
               </div>
             </div>
             <button
-              disabled={loading} // ✅ Correct syntax
+              disabled={loading}
               type="submit"
               className={`button-confirm w-full h-10 rounded-lg border-2 border-black 
     bg-lightblue shadow-lg font-semibold text-black cursor-pointer 
@@ -263,17 +262,9 @@ const Signup = () => {
                 </span>
               </span>
             </div>
-            {/* Forgot Password Button */}
-        <div className="mt-4 text-center">
-          <button
-            // onClick={navigate('/ForgotPassword')}
-            className="forgotPassword"
-          >
-            Forgot your password?
-          </button>
-        </div>
           </form>
         ) : (
+          /*Login Form*/
           <form
             className="form"
             onSubmit={loginWithEmail} // Use onSubmit to trigger the function
@@ -302,25 +293,6 @@ const Signup = () => {
               onChange={(e) => setPassword(e.target.value)} // Update state on input change
             />
             <div className="mt-[0.5 rem] login-with flex gap-4 self-center">
-              {/* Facebook icon */}
-              <div
-                className="button-log p-3 w-12 h-12 flex justify-center items-center rounded-full border-2 border-black bg-lightblue shadow-lg cursor-pointer"
-                onClick={signupWithFacebook}
-              >
-                <svg
-                  width="100"
-                  height="100"
-                  viewBox="0 0 100 100"
-                  fill="none"
-                  xmlns="http://www.w3.org/2000/svg"
-                >
-                  <circle cx="50" cy="50" r="45" fill="#F5F5DC" />
-                  <path
-                    d="M63 30H57C53.134 30 50 33.134 50 37V43H63V53H50V70H40V53H34V43H40V37C40 29.82 45.82 24 53 24H63V30Z"
-                    fill="black"
-                  />
-                </svg>
-              </div>
               {/* Google Icon */}
               <div
                 className="button-log p-3 w-12 h-12 flex justify-center items-center rounded-full border-2 border-black bg-lightblue shadow-lg cursor-pointer"
@@ -358,6 +330,21 @@ const Signup = () => {
                 </span>
               </span>
             </div>
+
+            {/* Forgot Password Button */}
+            <div className="mt-4 text-center">
+              <p className="forgotPassword text-[woff1]" onClick={handleForgotPasswordClick}>Forgot your password?</p>
+            </div>
+            {/* Forgot Password Form */}
+            {isFormVisible && (
+              <div className="modal-overlay">
+                <div className="forgot-password-form">
+                  <h2>Reset Password</h2>
+                  <input type="email" placeholder="Enter your email" />
+                  <button onClick={setIsFormVisible(false)}>close</button>
+                </div>
+              </div>
+            )}
           </form>
         )}
       </div>

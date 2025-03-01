@@ -37,15 +37,6 @@
     font-family: woff2;
   }
 
-  .forgotPassword {
-    border: none;
-    background-color: lightblue ;
-    font-size: 14px;
-    color: #2d8cf0;
-    cursor: pointer;
-    font-family: woff2;
-  }
-
   .title {
     color: var(--font-color);
     font-weight: 900;

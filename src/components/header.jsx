@@ -1,42 +1,41 @@
 import React, { useEffect } from 'react';
 import './header.css';
 import { auth } from '../firebase';
-import {useAuthState} from 'react-firebase-hooks/auth';
-import { Navigate, useNavigate } from 'react-router-dom';
+import { useAuthState } from 'react-firebase-hooks/auth';
+import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import { signOut } from 'firebase/auth';
 
 const Header = () => {
-  const [user , loading ] = useAuthState(auth);
+  const [user, loading] = useAuthState(auth);
   const navigate = useNavigate();
 
   useEffect(() => {
-    if(user){
-      navigate('/dashboard');
+    if (!loading && !user) {
+      navigate('/');
     }
-  }, [user , loading])
-  
+  }, [user, loading, navigate]); // Added navigate to dependencies
+
   function logoutFunction() {
-    try {
-      signOut(auth).then(() => {
-        navigate('/');
+    signOut(auth)
+      .then(() => {
         toast.success("Logged Out Successfully!");
-      }).catch((error) => {
+        localStorage.clear();
+        navigate('/');  // Ensure redirection happens after logout
+      })
+      .catch((error) => {
         toast.error(error.message);
       });
-    } catch (error) {
-      toast.error(error.message);
-    }
-    
   }
 
   return (
-    <div className='flex items-center justify-between w-1'>
-      <div className='navbar font-medium text-[2rem] font-[woff2]'>Tracky</div>
+    <div className='flex items-center justify-between w-full'>
+      <div className='navbar font-medium text-[2rem]'>Tracky</div>
       {user && (
-        <button className='logout font-[woff2] text-3xl' onClick={logoutFunction}>Logout</button>
+        <button className='logout text-3xl' onClick={logoutFunction}>
+          Logout
+        </button>
       )}
-      
     </div>
   );
 };
