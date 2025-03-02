@@ -87,8 +87,10 @@ const Dashboard = () => {
   };
 
   useEffect(() => {
-    fetchTransactions();
-  }, []);
+    if (user) {
+      fetchTransactions();
+    }
+  }, [user]);
 
   const onFinish = (values, type) => {
     const newTransaction = {
@@ -151,21 +153,28 @@ const Dashboard = () => {
     }
   }
 
+  
+  
   async function fetchTransactions() {
     setLoading(true);
     if (user) {
-      const q = query(collection(db, `users/${user.uid}/transactions`));
-      const querySnapshot = await getDocs(q);
-      let transactionsArray = [];
-      querySnapshot.forEach((doc) => {
-        // doc.data() is never undefined for query doc snapshots
-        transactionsArray.push(doc.data());
-      });
-      setTransactions(transactionsArray);
-      toast.success("Transactions Fetched!");
+      try {
+        const q = query(collection(db, `users/${user.uid}/transactions`));
+        const querySnapshot = await getDocs(q);
+        let transactionsArray = [];
+        querySnapshot.forEach((doc) => {
+          transactionsArray.push(doc.data());
+        });
+        setTransactions(transactionsArray);
+        toast.success("Transactions Fetched!");
+      } catch (error) {
+        console.error("Error fetching transactions:", error);
+        toast.error("Error fetching transactions.");
+      }
     }
     setLoading(false);
   }
+  
 
   /*async function fetchTransactions() {
     setLoading(true);
