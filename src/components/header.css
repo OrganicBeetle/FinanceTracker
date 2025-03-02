@@ -1,4 +1,5 @@
 .navbar{
+    border: none;
     background-color: #5a90abde;
     padding: 10px;
     position: sticky;
@@ -13,10 +14,9 @@
 .logout{
     border: none;
     background-color: #5a90abde;
-    padding: 20px;
+    padding: 19.5px;
     font-size: 16px;
     cursor: pointer;
-    border-radius: 1px;
     transition: background-color 0.3s ease, transform 0.3s ease;
     
 }

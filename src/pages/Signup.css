@@ -38,8 +38,6 @@
 
   .redirect span{
     font-size: 16px;
-    font-weight: 100;
-    /* font-weight:; */
     cursor: pointer;
     font-family: woff3;
   }
@@ -121,7 +119,7 @@
   }
   
   .button-confirm {
-    margin: 5px auto 0 auto;
+    margin: 5px auto 25px auto;
     width: 120px;
     height: 40px;
     border-radius: 5px;
@@ -159,5 +157,11 @@
     transform: translate(3px, 3px);
   }
 
-
-  
+  .forgotPassword {
+    margin-top: -5px;
+    font-family: woff3;
+    cursor: pointer;
+    color: #2D8CF0;
+    font-weight: 600;
+    font-size: 16px;
+  }
