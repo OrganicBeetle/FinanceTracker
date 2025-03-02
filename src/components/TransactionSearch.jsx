@@ -12,6 +12,7 @@ const TransactionSearch = ({
   exportToCsv,
   addTransaction,
   fetchTransactions,
+  onTransactionClick,
 }) => {
   const [searchTerm, setSearchTerm] = useState("");
   const [searchTag, setSearchTag] = useState("");
@@ -77,32 +78,32 @@ const TransactionSearch = ({
   const filteredTransactions = transactions.filter((transaction) => {
 
     const selectedDateString = searchDate ? searchDate.format("YYYY-MM-DD") : null;
-  
+
     const searchMatch = searchTerm
       ? transaction.name.toLowerCase().includes(searchTerm.toLowerCase())
       : true;
-  
+
     const tagSearchMatch = searchTag
       ? transaction.tag.toLowerCase().includes(searchTag.toLowerCase())
       : true;
-  
+
     const dateMatch = selectedDateString
       ? transaction.date === selectedDateString
       : true;
-  
+
     const tagMatch = selectedTag ? transaction.tag === selectedTag : true;
     const typeMatch = typeFilter ? transaction.type === typeFilter : true;
-  
+
     console.log("Filtering transaction:", {
       name: transaction.name,
-      transactionDate: transaction.date,       
-      searchDate: selectedDateString,         
+      transactionDate: transaction.date,
+      searchDate: selectedDateString,
       isSameDay: dateMatch
     });
-  
+
     return searchMatch && tagSearchMatch && dateMatch && tagMatch && typeMatch;
   });
-  
+
 
   const sortedTransactions = [...filteredTransactions].sort((a, b) => {
     if (sortKey === "date") {
@@ -221,13 +222,13 @@ const TransactionSearch = ({
           </div>
         </div>
 
-        <Table columns={columns} dataSource={dataSource} onRow={(record) => ({
-          onClick: () => onEdit(record),
-        })} />
-
-
-
-
+        <Table
+        columns={columns}
+        dataSource={dataSource}
+        onRow={(record) => ({
+          onClick: () => onTransactionClick(record),
+        })}
+      />
       </div>
     </div>
   );

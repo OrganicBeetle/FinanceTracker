@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Card, Row } from "antd";
+import { Card, Row, Modal, Button} from "antd";
 import { Line, Pie } from "@ant-design/plots";
 import moment from "moment";
 import TransactionSearch from "../components/TransactionSearch";
@@ -16,8 +16,8 @@ import { useNavigate } from "react-router-dom";
 import { unparse } from "papaparse";
 import Header from "../components/header.jsx";
 import '../App.css';
-//import { doc, updateDoc } from "firebase/firestore";
-import {doc , deleteDoc} from "firebase/firestore";
+import { doc, updateDoc, deleteDoc} from "firebase/firestore";
+import EditTransactionModal from "../components/Modals/EditTransaction";
 
 const Dashboard = () => {
   const [user] = useAuthState(auth);
@@ -28,6 +28,9 @@ const Dashboard = () => {
   const [currentBalance, setCurrentBalance] = useState(0);
   const [income, setIncome] = useState(0);
   const [expenses, setExpenses] = useState(0);
+  const [selectedTransaction, setSelectedTransaction] = useState(null);
+  const [isActionModalVisible, setIsActionModalVisible] = useState(false);
+  const [isEditModalVisible, setIsEditModalVisible] = useState(false);
 
   const navigate = useNavigate();
 
@@ -77,21 +80,54 @@ const Dashboard = () => {
       toast.error("User is not authenticated");
       return;
     }
-  
+
     try {
       // Delete the transaction from Firestore
       const transactionRef = doc(db, `users/${user.uid}/transactions`, transactionId);
       await deleteDoc(transactionRef);
-  
+
       // Remove the transaction from the state
       const updatedTransactions = transactions.filter(transaction => transaction.id !== transactionId);
       setTransactions(updatedTransactions);
-  
+
       toast.success("Transaction Deleted!");
     } catch (e) {
       console.error("Error deleting document: ", e);
       toast.error("Couldn't delete the transaction.");
     }
+  };
+
+  const updateTransaction = async (updatedValues) => {
+    if (!user || !user.uid) {
+      toast.error("User is not authenticated");
+      return;
+    }
+
+    try {
+      // Update in Firestore
+      const transactionRef = doc(db, `users/${user.uid}/transactions`, selectedTransaction.id);
+      await updateDoc(transactionRef, updatedValues);
+
+      // Update the transaction in the local state
+      setTransactions((prevTransactions) =>
+        prevTransactions.map((transaction) =>
+          transaction.id === selectedTransaction.id
+            ? { ...transaction, ...updatedValues }
+            : transaction
+        )
+      );
+
+      toast.success("Transaction updated successfully!");
+      setIsEditModalVisible(false);
+    } catch (e) {
+      console.error("Error updating transaction: ", e);
+      toast.error("Failed to update transaction");
+    }
+  };
+
+  const handleTransactionClick = (transaction) => {
+    setSelectedTransaction(transaction);
+    setIsActionModalVisible(true);
   };
 
   const showExpenseModal = () => {
@@ -176,7 +212,7 @@ const Dashboard = () => {
       }
     }
   }
-  
+
   async function fetchTransactions() {
     setLoading(true);
     if (user) {
@@ -185,8 +221,7 @@ const Dashboard = () => {
         const querySnapshot = await getDocs(q);
         let transactionsArray = [];
         querySnapshot.forEach((doc) => {
-          console.log("Firestore doc data:", doc.data());
-          transactionsArray.push(doc.data());
+          transactionsArray.push({ ...doc.data(), id: doc.id });
         });
         setTransactions(transactionsArray);
         toast.success("Transactions Fetched!");
@@ -291,8 +326,43 @@ const Dashboard = () => {
                 exportToCsv={exportToCsv}
                 fetchTransactions={fetchTransactions}
                 addTransaction={addTransaction}
+                onTransactionClick={handleTransactionClick}
               />
             </div>
+
+            {isActionModalVisible && (
+              <Modal
+                title="Choose an Action"
+                visible={isActionModalVisible}
+                onCancel={() => setIsActionModalVisible(false)}
+                footer={[
+                  <Button key="edit" type="primary" onClick={() => {
+                    setIsActionModalVisible(false);
+                    setIsEditModalVisible(true);
+                  }}>
+                    Edit
+                  </Button>,
+                  <Button key="delete" danger onClick={async () => {
+                    await deleteTransaction(selectedTransaction.id);
+                    setIsActionModalVisible(false);
+                  }}>
+                    Delete
+                  </Button>,
+                ]}
+              >
+                <p>What would you like to do with this transaction?</p>
+              </Modal>
+            )}
+
+            {isEditModalVisible && selectedTransaction && (
+              <EditTransactionModal
+                visible={isEditModalVisible}
+                onCancel={() => setIsEditModalVisible(false)}
+                onSubmit={updateTransaction}
+                initialValues={selectedTransaction}
+              />
+            )}
+            
           </>
         )}
       </div>
