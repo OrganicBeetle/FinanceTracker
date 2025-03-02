@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import "./header.css";
 import { auth } from "../firebase";
 import { useAuthState } from "react-firebase-hooks/auth";
@@ -6,9 +6,11 @@ import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import { signOut } from "firebase/auth";
 import userSvg from "../assets/user.svg";
+import Hamburger from "./Hamburger"
 
 const Header = () => {
   const [user, loading] = useAuthState(auth);
+  const [isHovered, setIsHovered]=useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -31,9 +33,12 @@ const Header = () => {
 
   return (
     <div className="flex items-center justify-between w-full py-4 px-6 bg-gray-800 text-white">
-      <div className="navbar font-medium text-[2rem]">Tracky</div>
+      <div className="navbar font-medium text-[2rem]">
+        {user && <Hamburger isHovered={isHovered} setIsHovered={setIsHovered}/>}
+        Tracky
+      </div>
       {user && (
-        <p
+        <div
           className="logout flex items-center text-3xl"
           onClick={logoutFunction}
         >
@@ -45,7 +50,7 @@ const Header = () => {
             className="mr-2" // margin-right to separate the image from the text
           />
           Logout
-        </p>
+        </div>
       )}
     </div>
   );
