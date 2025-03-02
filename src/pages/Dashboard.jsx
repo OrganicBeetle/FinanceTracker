@@ -17,6 +17,7 @@ import { unparse } from "papaparse";
 import Header from "../components/header.jsx";
 import '../App.css';
 //import { doc, updateDoc } from "firebase/firestore";
+import {doc , deleteDoc} from "firebase/firestore";
 
 const Dashboard = () => {
   const [user] = useAuthState(auth);
@@ -70,6 +71,29 @@ const Dashboard = () => {
   };
 
   const { balanceData, spendingDataArray } = processChartData();
+
+  const deleteTransaction = async (transactionId) => {
+    if (!user || !user.uid) {
+      toast.error("User is not authenticated");
+      return;
+    }
+  
+    try {
+      // Delete the transaction from Firestore
+      const transactionRef = doc(db, `users/${user.uid}/transactions`, transactionId);
+      await deleteDoc(transactionRef);
+  
+      // Remove the transaction from the state
+      const updatedTransactions = transactions.filter(transaction => transaction.id !== transactionId);
+      setTransactions(updatedTransactions);
+  
+      toast.success("Transaction Deleted!");
+    } catch (e) {
+      console.error("Error deleting document: ", e);
+      toast.error("Couldn't delete the transaction.");
+    }
+  };
+
   const showExpenseModal = () => {
     setIsExpenseModalVisible(true);
   };
@@ -152,8 +176,6 @@ const Dashboard = () => {
       }
     }
   }
-
-  
   
   async function fetchTransactions() {
     setLoading(true);
@@ -174,24 +196,6 @@ const Dashboard = () => {
     }
     setLoading(false);
   }
-  
-
-  /*async function fetchTransactions() {
-    setLoading(true);
-    if (user) {
-      const q = query(collection(db, `users/${user.uid}/transactions`));
-      const querySnapshot = await getDocs(q);
-      let transactionsArray = [];
-      querySnapshot.forEach((doc) => {
-        // Include the document ID in the transaction object
-        transactionsArray.push({ id: doc.id, ...doc.data() });
-      });
-      setTransactions(transactionsArray);
-      toast.success("Transactions Fetched!");
-    }
-    setLoading(false);
-  }*/
-
 
   const balanceConfig = {
     data: balanceData,

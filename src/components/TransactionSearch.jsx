@@ -13,7 +13,7 @@ const TransactionSearch = ({
   exportToCsv,
   addTransaction,
   fetchTransactions,
-  //updateTransaction,
+  updateTransaction,
 }) => {
   const [searchTerm, setSearchTerm] = useState("");
   const [searchTag, setSearchTag] = useState("");
@@ -21,8 +21,8 @@ const TransactionSearch = ({
   const [searchDate, setSearchDate] = useState(null);
   const [typeFilter, setTypeFilter] = useState("");
   const [sortKey, setSortKey] = useState("");
-  //const [editingTransaction, setEditingTransaction] = useState(null);
-  //const [isEditModalVisible, setIsEditModalVisible] = useState(false);
+  const [editingTransaction, setEditingTransaction] = useState(null);
+  const [isEditModalVisible, setIsEditModalVisible] = useState(false);
   const [form] = Form.useForm();
   const fileInput = useRef();
 
@@ -50,7 +50,7 @@ const TransactionSearch = ({
   }
 
   // Function to open the modal with the selected transaction's data
-  /*const onEdit = (transaction) => {
+  const onEdit = (transaction) => {
     setEditingTransaction(transaction);  // Set transaction to edit
     form.setFieldsValue({
       ...transaction,
@@ -72,7 +72,7 @@ const TransactionSearch = ({
     setIsEditModalVisible(false);  // Close modal
     fetchTransactions();  // Refresh transaction list
     toast.success("Transaction updated!");
-  };*/
+  };
 
   const columns = [
     {
@@ -232,9 +232,11 @@ const TransactionSearch = ({
           </div>
         </div>
 
-        <Table columns={columns} dataSource={dataSource} /*onRow={(record) => ({
+        <Table columns={columns} dataSource={dataSource} onRow={(record) => ({
           onClick: () => onEdit(record),
-        })}*//>
+        })}/>
+
+        
 
 
       </div>
