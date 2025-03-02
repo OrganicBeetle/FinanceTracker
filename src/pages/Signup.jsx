@@ -11,6 +11,7 @@ import { doc, setDoc } from "firebase/firestore";
 import { getDoc } from "firebase/firestore";
 import { Link, useNavigate } from "react-router-dom";
 import { GoogleAuthProvider, signInWithPopup } from "firebase/auth";
+import ForgotPassword from "../components/ForgotPassword";
 
 const Signup = () => {
   const [name, setName] = useState("");
@@ -315,12 +316,8 @@ const Signup = () => {
                   Sign Up
                 </span>
               </span>
-            {/* {/* </div>
-            <div className="mt-4 text-center">
-              <p type="button" className="forgotPassword">
-                Forgot your password?
-              </p> */}
             </div>
+            <ForgotPassword/>
           </form>
         )}
       </div>
