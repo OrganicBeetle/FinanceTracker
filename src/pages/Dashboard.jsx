@@ -119,7 +119,7 @@ const Dashboard = () => {
   const onFinish = (values, type) => {
     const newTransaction = {
       type: type,
-      date: moment(values.date).format("YYYY-MM-DD"),
+      date: values.date.format("YYYY-MM-DD"),
       amount: parseFloat(values.amount),
       tag: values.tag,
       name: values.name,
@@ -185,6 +185,7 @@ const Dashboard = () => {
         const querySnapshot = await getDocs(q);
         let transactionsArray = [];
         querySnapshot.forEach((doc) => {
+          console.log("Firestore doc data:", doc.data());
           transactionsArray.push(doc.data());
         });
         setTransactions(transactionsArray);
@@ -234,21 +235,6 @@ const Dashboard = () => {
     document.body.removeChild(link);
   }
 
-  /*async function updateTransaction(transaction) {
-    try {
-      // Check if the transaction has an id field
-      if (!transaction.id) {
-        throw new Error("Transaction ID is missing.");
-      }
-  
-      const transactionRef = doc(db, `users/${user.uid}/transactions`, transaction.id);  // Get the transaction doc by ID
-      await updateDoc(transactionRef, transaction);  // Update the transaction in Firestore
-      toast.success("Transaction updated!");
-    } catch (error) {
-      console.error("Error updating transaction:", error);
-      toast.error("Error updating transaction.");
-    }
-  }*/
 
   return (
     <div>
@@ -305,7 +291,6 @@ const Dashboard = () => {
                 exportToCsv={exportToCsv}
                 fetchTransactions={fetchTransactions}
                 addTransaction={addTransaction}
-              //updateTransaction={updateTransaction}
               />
             </div>
           </>

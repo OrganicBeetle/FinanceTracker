@@ -3,7 +3,6 @@ import { Input, Table, Select, Radio, DatePicker, Modal, Form, Button } from "an
 import search from "../assets/search.svg";
 import { parse } from "papaparse";
 import { toast } from "react-toastify";
-import moment from "moment";
 
 const { Search } = Input;
 const { Option } = Select;
@@ -13,7 +12,6 @@ const TransactionSearch = ({
   exportToCsv,
   addTransaction,
   fetchTransactions,
-  updateTransaction,
 }) => {
   const [searchTerm, setSearchTerm] = useState("");
   const [searchTag, setSearchTag] = useState("");
@@ -21,8 +19,6 @@ const TransactionSearch = ({
   const [searchDate, setSearchDate] = useState(null);
   const [typeFilter, setTypeFilter] = useState("");
   const [sortKey, setSortKey] = useState("");
-  const [editingTransaction, setEditingTransaction] = useState(null);
-  const [isEditModalVisible, setIsEditModalVisible] = useState(false);
   const [form] = Form.useForm();
   const fileInput = useRef();
 
@@ -48,31 +44,6 @@ const TransactionSearch = ({
       toast.error(e.message);
     }
   }
-
-  // Function to open the modal with the selected transaction's data
-  const onEdit = (transaction) => {
-    setEditingTransaction(transaction);  // Set transaction to edit
-    form.setFieldsValue({
-      ...transaction,
-      date: moment(transaction.date),  // Ensure date is in moment format
-    });
-    setIsEditModalVisible(true);  // Show modal
-  };
-  
-
-  // Function to handle the update of the transaction
-  const handleEditFinish = async (values) => {
-    const updatedTransaction = {
-      ...editingTransaction,
-      ...values,
-      date: moment(values.date).format("YYYY-MM-DD"),  // Format date
-    };
-
-    await updateTransaction(updatedTransaction);  // Update transaction in DB
-    setIsEditModalVisible(false);  // Close modal
-    fetchTransactions();  // Refresh transaction list
-    toast.success("Transaction updated!");
-  };
 
   const columns = [
     {
@@ -104,20 +75,34 @@ const TransactionSearch = ({
 
 
   const filteredTransactions = transactions.filter((transaction) => {
+
+    const selectedDateString = searchDate ? searchDate.format("YYYY-MM-DD") : null;
+  
     const searchMatch = searchTerm
       ? transaction.name.toLowerCase().includes(searchTerm.toLowerCase())
       : true;
+  
     const tagSearchMatch = searchTag
       ? transaction.tag.toLowerCase().includes(searchTag.toLowerCase())
       : true;
-    const dateMatch = searchDate
-      ? moment(transaction.date).isSame(searchDate, 'day')
+  
+    const dateMatch = selectedDateString
+      ? transaction.date === selectedDateString
       : true;
+  
     const tagMatch = selectedTag ? transaction.tag === selectedTag : true;
     const typeMatch = typeFilter ? transaction.type === typeFilter : true;
-
+  
+    console.log("Filtering transaction:", {
+      name: transaction.name,
+      transactionDate: transaction.date,       
+      searchDate: selectedDateString,         
+      isSameDay: dateMatch
+    });
+  
     return searchMatch && tagSearchMatch && dateMatch && tagMatch && typeMatch;
   });
+  
 
   const sortedTransactions = [...filteredTransactions].sort((a, b) => {
     if (sortKey === "date") {
@@ -169,9 +154,13 @@ const TransactionSearch = ({
         <DatePicker
           placeholder="Search by Date"
           format="YYYY-MM-DD"
-          onChange={(date) => setSearchDate(date)}
+          onChange={(date) => {
+            console.log("User picked date:", date ? date.format("YYYY-MM-DD") : "null");
+            setSearchDate(date);
+          }}
           style={{ width: 200 }}
         />
+
 
         <Select
           className="select-input"
@@ -234,9 +223,9 @@ const TransactionSearch = ({
 
         <Table columns={columns} dataSource={dataSource} onRow={(record) => ({
           onClick: () => onEdit(record),
-        })}/>
+        })} />
 
-        
+
 
 
       </div>
