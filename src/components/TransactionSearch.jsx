@@ -227,6 +227,7 @@ const TransactionSearch = ({
         dataSource={dataSource}
         onRow={(record) => ({
           onClick: () => onTransactionClick(record),
+          style: { cursor: "pointer" }
         })}
       />
       </div>
