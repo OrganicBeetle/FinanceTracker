@@ -1,6 +1,5 @@
 import "./Hamburger.css"
 const Hamburger = ({ isHovered, setIsHovered }) => {
-
     const Scroll = () => {
         const element = document.getElementById("transaction-history");
         if (element) {
