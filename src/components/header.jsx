@@ -45,9 +45,9 @@ const Header = () => {
           <img
             src={user.photoURL ? user.photoURL : userSvg}
             width={user.photoURL ? "32" : "24"}
-            style={{ borderRadius: "50%", marginRight: 10}}
-            alt="User Profile"
-            className="mr-2" // margin-right to separate the image from the text
+            height={"24"}
+            style={{marginRight: 10}}
+            // alt="User Profile"
           />
           Logout
         </div>

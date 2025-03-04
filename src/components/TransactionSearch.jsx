@@ -3,6 +3,7 @@ import { Input, Table, Select, Radio, DatePicker, Modal, Form, Button } from "an
 import search from "../assets/search.svg";
 import { parse } from "papaparse";
 import { toast } from "react-toastify";
+import "remixicon/fonts/remixicon.css";
 
 const { Search } = Input;
 const { Option } = Select;
@@ -71,6 +72,18 @@ const TransactionSearch = ({
       title: "Tag",
       dataIndex: "tag",
       key: "tag",
+    },
+    {
+      title: "Actions",
+      key: "actions",
+      render: (_, record) => (
+        <span
+          // onClick={() => onTransactionClick(record)}
+          style={{ cursor: "pointer", color: "#1890ff", fontSize: "18px" }}
+        >
+          <i className="ri-edit-line"></i>
+        </span>
+      ),
     },
   ];
 

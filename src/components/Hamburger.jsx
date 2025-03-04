@@ -12,7 +12,7 @@ const Hamburger = ({ isHovered, setIsHovered }) => {
             onMouseEnter={() => setIsHovered(true)}
             onMouseLeave={() => setIsHovered(false)}
         >
-            <span className="hamburger-icon">☰</span>
+            <span className="hamburger-icon" onClick={Scroll}>☰</span>
             {isHovered && <p className="menu-text" onClick={Scroll}>Transaction History</p>}
         </div>
     )

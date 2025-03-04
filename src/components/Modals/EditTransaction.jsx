@@ -8,7 +8,7 @@ const EditTransactionModal = ({ visible, onCancel, onSubmit, initialValues }) =>
   return (
     <Modal
       title="Edit Transaction"
-      visible={visible}
+      open={visible}
       onCancel={onCancel}
       footer={null}
     >
@@ -22,7 +22,6 @@ const EditTransactionModal = ({ visible, onCancel, onSubmit, initialValues }) =>
           tag: initialValues.tag,
         }}
         onFinish={(values) => {
-          // Format the date before submitting
           values.date = values.date.format("YYYY-MM-DD");
           values.amount = parseFloat(values.amount);
           onSubmit(values);
@@ -52,16 +51,15 @@ const EditTransactionModal = ({ visible, onCancel, onSubmit, initialValues }) =>
         <Form.Item
           label="Tag"
           name="tag"
-          rules={[{ required: true, message: "Please select a tag!" }]}
+          rules={[{ required: true, message: "Please select or enter a tag!" }]}
         >
-          <Select>
+          <Select mode="tags" placeholder="Select or type a tag">
             <Select.Option value="food">Food</Select.Option>
             <Select.Option value="education">Education</Select.Option>
             <Select.Option value="office">Office</Select.Option>
             <Select.Option value="salary">Salary</Select.Option>
             <Select.Option value="freelance">Freelance</Select.Option>
             <Select.Option value="investment">Investment</Select.Option>
-            {/* Add more options as needed */}
           </Select>
         </Form.Item>
         <Form.Item>

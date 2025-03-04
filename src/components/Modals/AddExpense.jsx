@@ -71,7 +71,7 @@ function AddExpenseModal({
           style={{ fontWeight: 600 }}
           rules={[{ required: true, message: "Please select a tag!" }]}
         >
-          <Select className="select-input-2">
+          <Select mode="tags" placeholder="Select or type a tag">
             <Select.Option value="food">Food</Select.Option>
             <Select.Option value="education">Education</Select.Option>
             <Select.Option value="office">Office</Select.Option>

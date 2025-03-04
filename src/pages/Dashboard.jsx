@@ -245,9 +245,38 @@ const Dashboard = () => {
     colorField: "category",
   };
 
-  function reset() {
-    console.log("resetting");
+  async function reset() {
+    if (!user || !user.uid) {
+      toast.error("User is not authenticated");
+      return;
+    }
+  
+    try {
+      const transactionsRef = collection(db, `users/${user.uid}/transactions`);
+      const querySnapshot = await getDocs(transactionsRef);
+  
+      // Loop through each transaction and delete it from Firestore
+      const batchPromises = querySnapshot.docs.map(async (docRef) => {
+        const transactionDoc = doc(db, `users/${user.uid}/transactions`, docRef.id);
+        return deleteDoc(transactionDoc);
+      });
+  
+      await Promise.all(batchPromises); 
+  
+      setTransactions([]); // Clear the local transactions state
+      setCurrentBalance(0);
+      setIncome(0);
+      setExpenses(0);
+  
+      toast.success("All transactions deleted!");
+    } catch (error) {
+      console.error("Error deleting transactions:", error);
+      toast.error("Failed to delete transactions.");
+    }
   }
+  
+  
+
   const cardStyle = {
     boxShadow: "0px 0px 30px 8px rgba(227, 227, 227, 0.75)",
     margin: "2rem",
@@ -312,7 +341,10 @@ const Dashboard = () => {
                   <Card variant={true} style={{ ...cardStyle, flex: 0.45 }}>
                     <h2>Total Spending</h2>
                     {spendingDataArray.length == 0 ? (
-                      <p>Seems like you haven't spent anything till now...</p>
+                      <div className="flex justify-center align-middle mt-[15rem] font-[woff2] text-lg">
+                        <p>Seems like you haven't spent anything till now...</p>
+                      </div>
+                      
                     ) : (
                       <Pie {...{ ...spendingConfig, data: spendingDataArray }} />
                     )}
@@ -333,7 +365,7 @@ const Dashboard = () => {
             {isActionModalVisible && (
               <Modal
                 title="Choose an Action"
-                visible={isActionModalVisible}
+                open={isActionModalVisible}
                 onCancel={() => setIsActionModalVisible(false)}
                 footer={[
                   <Button key="edit" type="primary" onClick={() => {
