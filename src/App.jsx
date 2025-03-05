@@ -4,7 +4,6 @@ import Signup from './pages/Signup';
 import Dashboard from './pages/Dashboard';
 import { ToastContainer } from 'react-toastify';
 import "react-toastify/dist/ReactToastify.css";
-import BudgetTracker from './pages/BudgetTracker';
 
 const isAuthenticated = () => {
   return localStorage.getItem("user") !== null; // Assumes user info is stored in localStorage
@@ -28,7 +27,6 @@ const App = () => {
           <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
         </Routes>
       </Router>
-      <BudgetTracker></BudgetTracker>
     </>
   );
 };
