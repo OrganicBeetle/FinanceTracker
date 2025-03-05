@@ -6,7 +6,7 @@ import { ToastContainer } from 'react-toastify';
 import "react-toastify/dist/ReactToastify.css";
 
 const isAuthenticated = () => {
-  return localStorage.getItem("user") !== null; // Assumes user info is stored in localStorage
+  return localStorage.getItem("user") !== null;
 };
 
 const ProtectedRoute = ({ children }) => {

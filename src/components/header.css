@@ -1,7 +1,7 @@
 .navbar{
     border: none;
     background-color: #5a90abde;
-    padding: 10px;
+    padding: 10.5px;
     position: sticky;
     top: 0;
     left: 0;
@@ -21,7 +21,7 @@
     font-weight: 600;
 }
 .logout:hover{
-    background-color: #0056b3; /* Darker background on hover */
+    background-color: #0056b3;
     transform: scale(1.1);
 }
 

@@ -78,7 +78,6 @@ const TransactionSearch = ({
       key: "actions",
       render: (_, record) => (
         <span
-          // onClick={() => onTransactionClick(record)}
           style={{ cursor: "pointer", color: "#1890ff", fontSize: "18px" }}
         >
           <i className="ri-edit-line"></i>
@@ -87,9 +86,7 @@ const TransactionSearch = ({
     },
   ];
 
-
   const filteredTransactions = transactions.filter((transaction) => {
-
     const selectedDateString = searchDate ? searchDate.format("YYYY-MM-DD") : null;
 
     const searchMatch = searchTerm
@@ -97,7 +94,7 @@ const TransactionSearch = ({
       : true;
 
     const tagSearchMatch = searchTag
-      ? transaction.tag.toLowerCase().includes(searchTag.toLowerCase())
+      ? (String(transaction.tag || "").toLowerCase().includes(searchTag.toLowerCase()))
       : true;
 
     const dateMatch = selectedDateString
@@ -107,16 +104,8 @@ const TransactionSearch = ({
     const tagMatch = selectedTag ? transaction.tag === selectedTag : true;
     const typeMatch = typeFilter ? transaction.type === typeFilter : true;
 
-    console.log("Filtering transaction:", {
-      name: transaction.name,
-      transactionDate: transaction.date,
-      searchDate: selectedDateString,
-      isSameDay: dateMatch
-    });
-
     return searchMatch && tagSearchMatch && dateMatch && tagMatch && typeMatch;
   });
-
 
   const sortedTransactions = [...filteredTransactions].sort((a, b) => {
     if (sortKey === "date") {
@@ -133,48 +122,34 @@ const TransactionSearch = ({
     ...transaction,
   }));
 
+  const getRowClassName = (record) => {
+    if (record.type === "income") {
+      return "income-row";
+    } else if (record.type === "expense") {
+      return "expense-row";
+    }
+    return "";
+  };
+
   return (
-    <div
-      style={{
-        width: "100%",
-        padding: "0rem 2rem",
-      }}
-    >
-      <div
-        style={{
-          display: "flex",
-          /*justifyContent: "space-between",*/
-          gap: "1rem",
-          alignItems: "center",
-          marginBottom: "1rem",
-        }}
-      >
+    <div style={{ width: "100%", padding: "0rem 2rem" }}>
+      <div style={{ display: "flex", gap: "1rem", alignItems: "center", marginBottom: "1rem" }}>
         <div className="input-flex">
           <img src={search} width="16" alt="Search" />
-          <input
-            placeholder="Search by Name"
-            onChange={(e) => setSearchTerm(e.target.value)}
-          />
+          <input placeholder="Search by Name" onChange={(e) => setSearchTerm(e.target.value)} />
         </div>
 
         <div className="input-flex">
           <img src={search} width="16" alt="Search" />
-          <input
-            placeholder="Search by Tag"
-            onChange={(e) => setSearchTag(e.target.value)}
-          />
+          <input placeholder="Search by Tag" onChange={(e) => setSearchTag(e.target.value)} />
         </div>
 
         <DatePicker
           placeholder="Search by Date"
           format="YYYY-MM-DD"
-          onChange={(date) => {
-            console.log("User picked date:", date ? date.format("YYYY-MM-DD") : "null");
-            setSearchDate(date);
-          }}
+          onChange={(date) => setSearchDate(date)}
           style={{ width: 200 }}
         />
-
 
         <Select
           className="select-input"
@@ -190,34 +165,15 @@ const TransactionSearch = ({
       </div>
 
       <div className="my-table">
-        <div
-          style={{
-            display: "flex",
-            justifyContent: "space-between",
-            alignItems: "center",
-            width: "100%",
-            marginBottom: "1rem",
-          }}
-        >
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", width: "100%", marginBottom: "1rem" }}>
           <h2>My Transactions</h2>
 
-          <Radio.Group
-            className="input-radio"
-            onChange={(e) => setSortKey(e.target.value)}
-            value={sortKey}
-          >
+          <Radio.Group className="input-radio" onChange={(e) => setSortKey(e.target.value)} value={sortKey}>
             <Radio.Button value="">No Sort</Radio.Button>
             <Radio.Button value="date">Sort by Date</Radio.Button>
             <Radio.Button value="amount">Sort by Amount</Radio.Button>
           </Radio.Group>
-          <div
-            style={{
-              display: "flex",
-              justifyContent: "center",
-              gap: "1rem",
-              width: "400px",
-            }}
-          >
+          <div style={{ display: "flex", justifyContent: "center", gap: "1rem", width: "400px" }}>
             <button className="btn" onClick={exportToCsv}>
               Export to CSV
             </button>
@@ -236,12 +192,13 @@ const TransactionSearch = ({
         </div>
 
         <Table
-        columns={columns}
-        dataSource={dataSource}
-        onRow={(record) => ({
-          onClick: () => onTransactionClick(record),
-        })}
-      />
+          columns={columns}
+          dataSource={dataSource}
+          onRow={(record) => ({
+            onClick: () => onTransactionClick(record),
+          })}
+          rowClassName={getRowClassName}
+        />
       </div>
     </div>
   );

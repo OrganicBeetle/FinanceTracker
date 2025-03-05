@@ -82,11 +82,11 @@ const Dashboard = () => {
     }
 
     try {
-      // Delete the transaction from Firestore
+      // Delete transaction from Firestore
       const transactionRef = doc(db, `users/${user.uid}/transactions`, transactionId);
       await deleteDoc(transactionRef);
 
-      // Remove the transaction from the state
+      // Remove transaction from the state
       const updatedTransactions = transactions.filter(transaction => transaction.id !== transactionId);
       setTransactions(updatedTransactions);
 
@@ -108,7 +108,7 @@ const Dashboard = () => {
       const transactionRef = doc(db, `users/${user.uid}/transactions`, selectedTransaction.id);
       await updateDoc(transactionRef, updatedValues);
 
-      // Update the transaction in the local state
+      // Update in the local state
       setTransactions((prevTransactions) =>
         prevTransactions.map((transaction) =>
           transaction.id === selectedTransaction.id
@@ -185,7 +185,7 @@ const Dashboard = () => {
     setCurrentBalance(incomeTotal - expensesTotal);
   };
 
-  // Calculate the initial balance, income, and expenses
+  // Calculating initial balance, income, and expenses
   useEffect(() => {
     calculateBalance();
   }, [transactions]);

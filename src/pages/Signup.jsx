@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import "./Signup.css"; // Import your existing CSS
+import "./Signup.css";
 import Header from "../components/header";
 import {
   createUserWithEmailAndPassword,
@@ -18,34 +18,15 @@ const Signup = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
-  const [loginForm, setLoginForm] = useState(false); // Track user sign-in status
+  const [loginForm, setLoginForm] = useState(false);
   const navigate = useNavigate();
-
-  const getFriendlyErrorMessage = (errorCode) => {
-    const errorMessages = {
-      "auth/email-already-in-use":
-        "This email is already in use. Try logging in.",
-      "auth/invalid-email": "Please enter a valid email address.",
-      "auth/weak-password": "Password must be at least 6 characters long.",
-      "auth/user-not-found": "No account found. Please sign up first.",
-      "auth/wrong-password":
-        "Incorrect password. Try again or reset your password.",
-      "auth/network-request-failed":
-        "Network error. Check your internet connection.",
-      "auth/popup-closed-by-user": "Google sign-in was canceled. Try again.",
-      "auth/cancelled-popup-request":
-        "Multiple popups were blocked. Please try again.",
-      default: "Something went wrong. Please try again.",
-    };
-
-    return errorMessages[errorCode] || errorMessages["default"];
-  };
+  
 
   const signupWithEmail = (e) => {
     setLoading(true);
     e.preventDefault(); // Prevent the default form submission
 
-    // Authenticate a New User Account
+    // Authenticate a New User
     if (name !== "" && email !== "" && password !== "") {
       createUserWithEmailAndPassword(auth, email, password)
         .then((userCredential) => {
@@ -65,13 +46,13 @@ const Signup = () => {
           setName("");
           setEmail("");
           setPassword("");
-          createUserDocument(user, name); // Pass name as a second argument
+          createUserDocument(user, name);
           navigate("/dashboard");
         })
         .catch((error) => {
           const errorCode = error.code;
           const errorMessage = error.message;
-          toast.error(getFriendlyErrorMessage(errorMessage));
+          toast.error((errorMessage));
           setLoading(false);
         });
     } else {
@@ -103,7 +84,7 @@ const Signup = () => {
         .catch((error) => {
           const errorCode = error.code;
           const errorMessage = error.message;
-          toast.error(getFriendlyErrorMessage(errorMessage));
+          toast.error((errorMessage));
           setLoading(false);
         });
     } else {
@@ -130,7 +111,7 @@ const Signup = () => {
             name: user.displayName || name,
           })
         );
-        createUserDocument(user, user.displayName); // Store user details in Firestore
+        createUserDocument(user, user.displayName);
         setLoading(false);
         console.log("Navigating to Dashboard...");
         navigate("/dashboard");
@@ -138,7 +119,7 @@ const Signup = () => {
       .catch((error) => {
         const errorCode = error.code;
         const errorMessage = error.message;
-        toast.error(getFriendlyErrorMessage(errorMessage));
+        toast.error((errorMessage));
         setLoading(false);
       });
   };
@@ -148,25 +129,22 @@ const Signup = () => {
 
     try {
       const userRef = doc(db, "users", user.uid);
-      const userData = await getDoc(userRef); // Fetch the user document
+      const userData = await getDoc(userRef);
 
       if (!userData.exists()) {
-        // If the document does not exist, create it
         await setDoc(userRef, {
-          name: user.displayName ? user.displayName : name, // Set display name or fallback to provided name
+          name: user.displayName ? user.displayName : name,
           email: user.email,
-          photoUrl: user.photoURL ? user.photoURL : "", // Ensure you use photoURL instead of photoUrl
+          photoUrl: user.photoURL ? user.photoURL : "",
           createdAt: new Date(),
         });
         // toast.success("User Document Created Successfully");
         setLoading(false);
       } else {
-        // If the document already exists, show an error
         // toast.error("Document already exists");
         setLoading(false);
       }
     } catch (e) {
-      // Catch any errors in either getting or setting the document
       toast.error(`Error: ${e.message}`);
       setLoading(false);
     }
