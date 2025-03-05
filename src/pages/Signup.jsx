@@ -307,7 +307,7 @@ const Signup = () => {
               {loading ? "Loading..." : "Let's go →"}
             </button>
             <div className="redirect">
-              <span className="font-semibold text-[1rem] mt-[2px]">
+              <span className="font-semibold text-[1rem]">
                 Don't have an account?{" "}
                 <span
                   className="font-bold cursor-pointer"
@@ -317,7 +317,7 @@ const Signup = () => {
                 </span>
               </span>
             </div>
-            <ForgotPassword/>
+            {/* <ForgotPassword/> */}
           </form>
         )}
       </div>

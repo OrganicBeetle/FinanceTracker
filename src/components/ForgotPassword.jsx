@@ -3,24 +3,28 @@ import React, { useState } from "react";
 const ForgotPassword = () => {
   const [isFormVisible, setIsFormVisible] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [email, setEmail] = useState(""); // State to handle email input
 
   const handleForgotPasswordClick = () => {
+    // Toggle the visibility of the form
+    console.log("Forgot Password clicked");
     setIsFormVisible(true);
   };
 
   const handleCloseForm = () => {
     setIsFormVisible(false);
+    setEmail(""); // Reset email input on close
   };
 
   const handlePasswordReset = (e) => {
     e.preventDefault();
     setLoading(true);
 
-    // Simulate password reset process (you can integrate Firebase or your logic here)
+    // Simulate password reset (replace with actual logic)
     setTimeout(() => {
       setLoading(false);
       alert("Password reset link sent!");
-      setIsFormVisible(false);
+      setIsFormVisible(false); // Close the form after successful reset
     }, 2000); // Simulate 2-second delay
   };
 
@@ -57,6 +61,8 @@ const ForgotPassword = () => {
                 placeholder="Enter your email"
                 className="w-full p-2 border-2 border-black rounded-md mb-12"
                 required
+                value={email}
+                onChange={(e) => setEmail(e.target.value)} // Update email state on input change
               />
               <div className="ResetPassword flex justify-center items-center">
                 <button
