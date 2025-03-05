@@ -1,9 +1,25 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { Modal, Form, Input, DatePicker, Select, Button } from "antd";
 import moment from "moment";
 
 const EditTransactionModal = ({ visible, onCancel, onSubmit, initialValues }) => {
   const [form] = Form.useForm();
+
+  // Convert initialValues.date to a moment object (if it’s a string)
+  const originalDate =
+    typeof initialValues.date === "string"
+      ? moment(initialValues.date, "YYYY-MM-DD")
+      : initialValues.date;
+  const originalDateStr = originalDate.format("YYYY-MM-DD");
+
+  useEffect(() => {
+    // Set all fields except date so the date field remains empty
+    form.setFieldsValue({
+      name: initialValues.name,
+      amount: initialValues.amount,
+      tag: initialValues.tag,
+    });
+  }, [initialValues, form]);
 
   return (
     <Modal
@@ -15,12 +31,6 @@ const EditTransactionModal = ({ visible, onCancel, onSubmit, initialValues }) =>
       <Form
         form={form}
         layout="vertical"
-        initialValues={{
-          name: initialValues.name,
-          amount: initialValues.amount,
-          date: moment(initialValues.date, "YYYY-MM-DD"),
-          tag: initialValues.tag,
-        }}
         onFinish={(values) => {
           values.date = values.date.format("YYYY-MM-DD");
           values.amount = parseFloat(values.amount);
@@ -44,9 +54,12 @@ const EditTransactionModal = ({ visible, onCancel, onSubmit, initialValues }) =>
         <Form.Item
           label="Date"
           name="date"
-          rules={[{ required: true, message: "Please select the date!" }]}
-        >
-          <DatePicker format="YYYY-MM-DD" />
+          rules={[{ required: true, message: "Please select the date!" }]}>
+          <DatePicker
+            placeholder={originalDateStr}
+            format="YYYY-MM-DD"
+            style={{ width: 200 }}
+          />
         </Form.Item>
         <Form.Item
           label="Tag"

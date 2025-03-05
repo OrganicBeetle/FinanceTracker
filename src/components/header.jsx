@@ -45,7 +45,7 @@ const Header = () => {
           <img
             src={user.photoURL ? user.photoURL : userSvg}
             width={user.photoURL ? "32" : "24"}
-            height={"24"}
+            height={"32"}
             style={{marginRight: 10}}
             // alt="User Profile"
           />
