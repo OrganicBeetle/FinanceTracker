@@ -13,15 +13,15 @@
 
 .logout{
     border: none;
-    background-color: #5a90abde;
     padding: 14px;
+    background-color: #5a90abde;
     font-size: 16px;
     cursor: pointer;
     transition: background-color 0.3s ease, transform 0.3s ease;
     font-weight: 600;
 }
 .logout:hover{
-    background-color: #0056b3; /* Darker background on hover */
+    background-color: #0056b3;
     transform: scale(1.1);
 }
 
