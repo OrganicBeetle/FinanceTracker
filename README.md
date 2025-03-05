@@ -15,7 +15,7 @@ A web-based Personal Finance Management Platform that enables users to efficient
 ✔ **Financial Goal Setting** – Set savings goals and track progress.
 ## 🌍 Hosted Links
 
-URL: 
+URL: https://tracky-xi.vercel.app/
 ## 🛠️ Technologies Used
 
 🔹 Frontend: HTML, CSS, JS, React.js, Tailwind CSS, Vite  
