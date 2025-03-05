@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Card, Row, Modal, Button} from "antd";
 import { Line, Pie } from "@ant-design/plots";
-import moment from "moment";
 import TransactionSearch from "../components/TransactionSearch";
 import AddIncomeModal from "../components/Modals/AddIncome";
 import AddExpenseModal from "../components/Modals/AddExpense";
@@ -34,46 +33,44 @@ const Dashboard = () => {
 
   const navigate = useNavigate();
 
-  const processChartData = () => {
-    const balanceData = [];
+  const processChartData = (transactions) => {
     const spendingData = {};
-
-    transactions.forEach((transaction) => {
-      const monthYear = moment(transaction.date).format("MMM YYYY");
-      const tag = transaction.tag;
-
+  
+    const sortedTransactions = [...transactions].sort(
+      (a, b) => new Date(a.date) - new Date(b.date)
+    );
+  
+    let runningBalance = 0;
+    const balanceData = [];
+  
+    sortedTransactions.forEach((transaction) => {
       if (transaction.type === "income") {
-        if (balanceData.some((data) => data.month === monthYear)) {
-          balanceData.find((data) => data.month === monthYear).balance +=
-            transaction.amount;
-        } else {
-          balanceData.push({ month: monthYear, balance: transaction.amount });
-        }
+        runningBalance += transaction.amount;
       } else {
-        if (balanceData.some((data) => data.month === monthYear)) {
-          balanceData.find((data) => data.month === monthYear).balance -=
-            transaction.amount;
-        } else {
-          balanceData.push({ month: monthYear, balance: -transaction.amount });
-        }
+        runningBalance -= transaction.amount;
 
-        if (spendingData[tag]) {
-          spendingData[tag] += transaction.amount;
+        if (spendingData[transaction.tag]) {
+          spendingData[transaction.tag] += transaction.amount;
         } else {
-          spendingData[tag] = transaction.amount;
+          spendingData[transaction.tag] = transaction.amount;
         }
       }
+  
+      balanceData.push({
+        date: transaction.date, 
+        balance: runningBalance,
+      });
     });
-
+  
     const spendingDataArray = Object.keys(spendingData).map((key) => ({
       category: key,
       value: spendingData[key],
     }));
-
+  
     return { balanceData, spendingDataArray };
   };
 
-  const { balanceData, spendingDataArray } = processChartData();
+  const { balanceData, spendingDataArray } = processChartData(transactions);
 
   const deleteTransaction = async (transactionId) => {
     if (!user || !user.uid) {
@@ -235,8 +232,13 @@ const Dashboard = () => {
 
   const balanceConfig = {
     data: balanceData,
-    xField: "month",
+    xField: "date",
     yField: "balance",
+
+    xAxis: {
+      type: "timeCat", 
+      tickCount: 5,
+    },
   };
 
   const spendingConfig = {
@@ -255,7 +257,6 @@ const Dashboard = () => {
       const transactionsRef = collection(db, `users/${user.uid}/transactions`);
       const querySnapshot = await getDocs(transactionsRef);
   
-      // Loop through each transaction and delete it from Firestore
       const batchPromises = querySnapshot.docs.map(async (docRef) => {
         const transactionDoc = doc(db, `users/${user.uid}/transactions`, docRef.id);
         return deleteDoc(transactionDoc);
@@ -335,7 +336,7 @@ const Dashboard = () => {
                 <Row gutter={16}>
                   <Card variant={true} style={cardStyle}>
                     <h2>Financial Statistics</h2>
-                    <Line {...{ ...balanceConfig, data: balanceData }} />
+                    <Line {...balanceConfig} />;
                   </Card>
 
                   <Card variant={true} style={{ ...cardStyle, flex: 0.45 }}>
