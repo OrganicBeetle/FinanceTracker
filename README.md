@@ -10,12 +10,10 @@ A web-based Personal Finance Management Platform that enables users to efficient
 ✔ **CSV Import/Export** – Import bank statements via CSV and export data for offline use or tax purposes.  
 ✔ **Transaction Management** – Search, filter, and sort transactions by date, category, or amount.  
 ✔ **User-Friendly Dashboard** – Intuitive UI displaying total income, expenses, and savings.  
-✔ **Data Security & Authentication** – Secure user authentication and encrypted financial data storage.  
-✔ **Notifications & Bill Reminders** – Alerts for upcoming payments and bills.  
-✔ **Financial Goal Setting** – Set savings goals and track progress.
+✔ **Data Security & Authentication** – Secure user authentication and encrypted financial data storage.
 ## 🌍 Hosted Links
 
-URL: 
+URL: https://tracky-xi.vercel.app/
 ## 🛠️ Technologies Used
 
 🔹 Frontend: HTML, CSS, JS, React.js, Tailwind CSS, Vite  
