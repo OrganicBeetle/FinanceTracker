@@ -165,15 +165,19 @@ const TransactionSearch = ({
       </div>
 
       <div className="my-table">
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", width: "100%", marginBottom: "1rem" }}>
-          <h2>My Transactions</h2>
+        <div className="flex flex-wrap sm:flex-nowrap justify-between items-center w-full gap-4 mb-4">
+          <h2 className="text-lg sm:text-xl font-semibold">My Transactions</h2>
 
-          <Radio.Group className="input-radio" onChange={(e) => setSortKey(e.target.value)} value={sortKey}>
+          <Radio.Group
+            className="input-radio flex-shrink-0"
+            onChange={(e) => setSortKey(e.target.value)}
+            value={sortKey}
+          >
             <Radio.Button value="">No Sort</Radio.Button>
             <Radio.Button value="date">Sort by Date</Radio.Button>
             <Radio.Button value="amount">Sort by Amount</Radio.Button>
           </Radio.Group>
-          <div style={{ display: "flex", justifyContent: "center", gap: "1rem", width: "400px" }}>
+          <div style={{ display: "flex", justifyContent: "center", gap: "1rem", width: "25vw" }}>
             <button className="btn" onClick={exportToCsv}>
               Export to CSV
             </button>

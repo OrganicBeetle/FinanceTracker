@@ -153,7 +153,7 @@ const Signup = () => {
   return (
     <>
       <Header />
-      <div className="min-h-screen flex justify-center items-center p-6">
+      <div className="min-h-[92vh] flex justify-center items-center p-6">
         {!loginForm ? (
           <form className="form" onSubmit={signupWithEmail}>
             <div className="title text-[10rem] font-bold mb-6 mt-[1rem] ml-[10px]">

@@ -278,13 +278,16 @@ const Dashboard = () => {
   
   
 
-  const cardStyle = {
-    boxShadow: "0px 0px 30px 8px rgba(227, 227, 227, 0.75)",
-    margin: "2rem",
-    borderRadius: "0.5rem",
-    minWidth: "400px",
-    flex: 1,
-  };
+    const cardStyle = {
+      boxShadow: "0px 0px 30px 8px rgba(227, 227, 227, 0.75)",
+      margin: "2rem",
+      borderRadius: "0.5rem",
+      minWidth: "250px",
+      maxWidth: "100%",          
+      width: "100%",             
+      flex: 1,
+  }
+
 
   function exportToCsv() {
     const csv = unparse(transactions, {
